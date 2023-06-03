@@ -6,15 +6,15 @@ importScripts("https://cdn.jsdelivr.net/pyodide/v0.23.0/full/pyodide.js");
 
 console.log("Pyodide downloaded");
 
-function prepPythonCode(python) {
-  return `
+let boilerplate = `
 globals().clear()
 from io import StringIO
 import sys
 
-import micropip
-await micropip.install("fastapi")
+`;
 
+function prepPythonCode(python) {
+  return `
 _old_stdout = sys.stdout
 sys.stdout = StringIO()
 
@@ -30,8 +30,16 @@ output
 async function loadPyodideAndPackages() {
   self.pyodide = await loadPyodide();
   console.log("Pyodide loaded");
-  await self.pyodide.loadPackage(["numpy", "pytz", "micropip"]);
+  await self.pyodide.loadPackage(["numpy", "pytz", "micropip", "ssl"]);
   console.log("Pyodide packages loaded");
+  await self.pyodide.runPythonAsync(boilerplate);
+  let results = await self.pyodide.runPythonAsync(`
+import micropip
+t1 = await micropip.install("fastapi")
+t2 = await micropip.install("uvicorn")
+print(t1, t2)
+`);
+  self.postMessage({ results, id: 0 });
 }
 
 let pyodideReadyPromise = loadPyodideAndPackages();

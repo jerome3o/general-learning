@@ -12,13 +12,15 @@ setInterval(function () {
     "seconds since loaded: " + Math.floor((new Date() - start) / 1000);
 }, 1000);
 
-// Pyodide stuff, todo move to worker
 let worker = new Worker("pyodideWorker.js");
 worker.onmessage = function (event) {
   console.log(event.data);
-  if (event.data === "pyodide loaded") {
-    document.getElementById("pyodide-loaded").innerHTML =
-      "pyodide loaded " + new Date();
+
+  // <div id="python-outputs"></div>
+  // add the output.results to the div in a new line, if it's not undefined
+  if (event.data.results !== undefined) {
+    document.getElementById("python-outputs").innerHTML +=
+      event.data.results + "<br>";
   }
 };
 
