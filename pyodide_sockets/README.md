@@ -15,4 +15,5 @@ from `pyodide_sockets/`
 
 ```sh
 wget https://cdn.jsdelivr.net/pyodide/v0.23.0/full/pyodide.js -P site/static/
+wget https://cdn.jsdelivr.net/pyodide/v0.23.0/full/python_stdlib.zip -P site/static/
 ```
