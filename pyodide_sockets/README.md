@@ -5,3 +5,14 @@ I would like to run two little FastAPI services in the browser and have them tal
 ## Rough plan
 
 Try and monkey patch the socket library in pyodide to send bytes through the js environment to another pyodide instance.
+
+
+## Some setup
+
+### Getting pyodide served locally
+
+from `pyodide_sockets/`
+
+```sh
+wget https://cdn.jsdelivr.net/pyodide/v0.23.0/full/pyodide.js -P site/static/
+```
