@@ -11,3 +11,13 @@ setInterval(function () {
   document.getElementById("seconds-since-loaded").innerHTML =
     "seconds since loaded: " + Math.floor((new Date() - start) / 1000);
 }, 1000);
+
+// Pyodide stuff, todo move to worker
+let worker = new Worker("pyodideWorker.js");
+worker.onmessage = function (event) {
+  print(event);
+  if (event.data === "pyodide loaded") {
+    document.getElementById("pyodide-loaded").innerHTML =
+      "pyodide loaded " + new Date();
+  }
+};
