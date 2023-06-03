@@ -15,9 +15,18 @@ setInterval(function () {
 // Pyodide stuff, todo move to worker
 let worker = new Worker("pyodideWorker.js");
 worker.onmessage = function (event) {
-  print(event);
+  console.log(event.data);
   if (event.data === "pyodide loaded") {
     document.getElementById("pyodide-loaded").innerHTML =
       "pyodide loaded " + new Date();
   }
+};
+
+// <textarea id="python-code" cols="30" rows="10"></textarea>
+// <button id="run-python-code">Run Python Code</button>
+
+// on button click send message to worker
+document.getElementById("run-python-code").onclick = function () {
+  let python = document.getElementById("python-code").value;
+  worker.postMessage({ python });
 };

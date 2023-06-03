@@ -1,5 +1,7 @@
 console.log("Worker started");
 
+self.postMessage("hello from the worker");
+
 importScripts("https://cdn.jsdelivr.net/pyodide/v0.23.0/full/pyodide.js");
 
 console.log("Pyodide downloaded");
@@ -9,6 +11,9 @@ function prepPythonCode(python) {
 globals().clear()
 from io import StringIO
 import sys
+
+import micropip
+await micropip.install("fastapi")
 
 _old_stdout = sys.stdout
 sys.stdout = StringIO()
@@ -25,7 +30,7 @@ output
 async function loadPyodideAndPackages() {
   self.pyodide = await loadPyodide();
   console.log("Pyodide loaded");
-  await self.pyodide.loadPackage(["numpy", "pytz"]);
+  await self.pyodide.loadPackage(["numpy", "pytz", "micropip"]);
   console.log("Pyodide packages loaded");
 }
 
