@@ -4,25 +4,35 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- load bootstrap -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <!-- load index.css -->
+    <link rel="stylesheet" href="index.css" />
     <title>Document</title>
   </head>
-  <body>
-    <!-- span to indicate if index.js is loaded -->
-    <span id="indexjs-loaded"></span>
+  <body class="container">
+    <div>
+      <h1>Pyodide Sockets</h1>
+      <!-- span to indicate if index.js is loaded -->
+      <span id="indexjs-loaded"></span>
 
-    <!-- span to indicate if pyodide-loaded -->
-    <span id="pyodide-loaded"></span>
+      <!-- span to indicate if pyodide-loaded -->
+      <span id="pyodide-loaded"></span>
 
-    <!-- add field that will display the seconds since loaded -->
-    <p id="seconds-since-loaded">seconds since loaded: 0</p>
+      <!-- add field that will display the seconds since loaded -->
+      <p id="seconds-since-loaded">seconds since loaded: 0</p>
 
-    <!-- multiline text input field to input python code -->
-    <textarea id="python-code" cols="30" rows="10"></textarea>
+      <!-- multiline text input field to input python code -->
+      <textarea id="python-code" cols="30" rows="10"></textarea>
 
-    <!-- button to run python code -->
-    <button id="run-python-code">Run Python Code</button>
+      <!-- button to run python code -->
+      <button id="run-python-code">Run Python Code</button>
 
-    <!-- load index.js script -->
-    <script type="module" src="index.js"></script>
+      <!-- load index.js script -->
+      <script type="module" src="index.js"></script>
+    </div>
   </body>
 </html>
