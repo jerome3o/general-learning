@@ -18,9 +18,17 @@ worker.onmessage = function (event) {
 
   // <div id="python-outputs"></div>
   // add the output.results to the div in a new line, if it's not undefined
+  console.log(event.data);
+
   if (event.data.results !== undefined) {
     document.getElementById("python-outputs").innerHTML +=
       event.data.results + "<br>";
+    console.log(event.data.results);
+  }
+  if (event.data.error !== "undefined") {
+    document.getElementById("python-outputs").innerHTML +=
+      event.data.error + "<br>";
+    console.log(event.data.error);
   }
 };
 
@@ -32,3 +40,12 @@ document.getElementById("run-python-code").onclick = function () {
   let python = document.getElementById("python-code").value;
   worker.postMessage({ python });
 };
+
+// fetch content from /static/py/main.py
+fetch("/static/py/main.py")
+  .then(function (response) {
+    return response.text();
+  })
+  .then(function (startingCode) {
+    document.getElementById("python-code").value = startingCode;
+  });
