@@ -25,3 +25,23 @@ fetch("http://localhost:8001/")
       4
     );
   });
+
+// button with id: test-basic-auth
+// output with id: basic-auth-result
+// on button press fetch http://localhost:8000/privileged-info
+// put the response in basic-auth-result
+document
+  .getElementById("test-basic-auth")
+  .addEventListener("click", function () {
+    fetch("http://localhost:8000/privileged-info")
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (json) {
+        document.getElementById("basic-auth-result").innerHTML = JSON.stringify(
+          json,
+          null,
+          4
+        );
+      });
+  });

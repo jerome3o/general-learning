@@ -1,11 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+import requests
+
 from common import (
     CLIENT_CONFIDENTIAL_SECRET,
     CLIENT_CONFIDENTIAL_ID,
     CLIENT_CONFIDENTIAL_REDIRECT_URI,
     CLIENT_CONFIDENTIAL_PORT,
+    RESOURCE_SERVER_BASE,
 )
 
 app = FastAPI()
@@ -27,6 +30,22 @@ async def hello():
         "CLIENT_CONFIDENTIAL_ID": CLIENT_CONFIDENTIAL_ID,
         "CLIENT_CONFIDENTIAL_REDIRECT_URI": CLIENT_CONFIDENTIAL_REDIRECT_URI,
     }
+
+
+@app.get("/privileged-info")
+def get_privileged_info(with_auth: bool = True):
+    # get privileged info from resource server to demonstrate basic auth
+    # https://requests.readthedocs.io/en/master/user/authentication/#basic-authentication
+    if with_auth:
+        response = requests.get(
+            f"{RESOURCE_SERVER_BASE}/privileged-info",
+            auth=(CLIENT_CONFIDENTIAL_ID, CLIENT_CONFIDENTIAL_SECRET),
+            # auth=("sdfsdfsdf", "sdfsdfs"),
+            # auth=(CLIENT_CONFIDENTIAL_ID, "sdfsdfs"),
+        )
+    else:
+        response = requests.get(f"{RESOURCE_SERVER_BASE}/privileged-info")
+    return response.json()
 
 
 def main():

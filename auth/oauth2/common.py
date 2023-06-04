@@ -1,6 +1,7 @@
 # Confidential refers to the oauth client type
 
 RESOURCE_SERVER_PORT = 8001
+RESOURCE_SERVER_BASE = f"http://localhost:{RESOURCE_SERVER_PORT}"
 
 # Assume already registered
 CLIENT_CONFIDENTIAL_PORT = 8000
