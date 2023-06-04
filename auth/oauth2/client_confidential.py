@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-import requests
-
 from common import (
     CLIENT_CONFIDENTIAL_SECRET,
     CLIENT_CONFIDENTIAL_ID,
