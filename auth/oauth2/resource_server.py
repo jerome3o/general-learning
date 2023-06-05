@@ -3,6 +3,7 @@ import datetime
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasicCredentials
+from fastapi.staticfiles import StaticFiles
 from typing_extensions import Annotated
 
 from common import (
@@ -46,7 +47,8 @@ app = FastAPI()
 client_auth = HTTPBasicWithAuth(
     users={c: _registered_clients[c]["client_secret"] for c in _registered_clients}
 )
-print(client_auth.users)
+
+app.mount("/static", StaticFiles(directory="auth_fe"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
