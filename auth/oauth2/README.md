@@ -7,6 +7,8 @@ I really want to understand oauth better. So I'm reading the RFC and implementin
 * A resource server + authentication server
 
 
+This mainly just explores the happy path, only for learning so a lot of stuff is implemented poorly/missing.
+
 ## Misc notes
 
 Query to the auth endpoint needs:
@@ -21,3 +23,11 @@ Query to the auth endpoint needs:
 * Doesn't support registering (Hard coded users / clients)
 * Doesn't handle/report errors properly (if at all)
 * Nothing expires yet (grants or tokens)
+
+
+## Todo
+
+* get state working from the client, sessions?
+* http response codes
+* client token storage
+* refreshing tokens

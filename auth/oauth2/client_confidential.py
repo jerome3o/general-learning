@@ -51,6 +51,17 @@ async def oauth2_callback(code: str, state: str):
         },
         auth=(CLIENT_CONFIDENTIAL_ID, CLIENT_CONFIDENTIAL_SECRET),
     )
+
+    # get privileged info from resource server
+    # https://requests.readthedocs.io/en/master/user/authentication/#bearer-authentication
+    response = requests.get(
+        f"{RESOURCE_SERVER_BASE}/user-privileged-info",
+        headers={
+            "Accept": "application/json",
+            "Authorization": f"Bearer {response.json()['access_token']}",
+        },
+    )
+
     return {"response_from_auth": response.json()}
 
 

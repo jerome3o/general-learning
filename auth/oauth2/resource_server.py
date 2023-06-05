@@ -3,7 +3,7 @@ from typing import List
 import secrets
 
 from pydantic import BaseModel
-from fastapi import FastAPI, Depends, Form
+from fastapi import FastAPI, Depends, Form, Header
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasicCredentials
@@ -248,8 +248,39 @@ async def token(
     return token.to_dto()
 
 
+@app.get("/user-privileged-info")
+def get_privileged_user_info(authorization: Annotated[str, Header()]):
+    # strip Bearer from the header
+    authorization = authorization.split(" ")[1]
+
+    # check if the token is valid
+    token: AccessToken = next(
+        (t for t in _access_tokens if t.access_token == authorization), None
+    )
+
+    if not token:
+        return {
+            "result": "failure",
+            "output": f"no token found for {authorization}",
+        }
+
+    if token.expires < datetime.datetime.now():
+        return {
+            "result": "failure",
+            "output": f"token expired for {authorization}",
+        }
+
+    return {
+        "authorization": authorization,
+        "result": "success",
+        "output": _registered_users["user1"]["privileged_info"]
+        + " "
+        + str(datetime.datetime.now()),
+    }
+
+
 @app.get("/client-privileged-info")
-def get_privileged_info(
+def get_privileged_client_info(
     credentials: Annotated[HTTPBasicCredentials, Depends(client_auth)]
 ):
     if credentials.username not in _registered_clients:
