@@ -20,3 +20,4 @@ Query to the auth endpoint needs:
 * Doesn't really have scopes
 * Doesn't support registering (Hard coded users / clients)
 * Doesn't handle/report errors properly (if at all)
+* Nothing expires yet (grants or tokens)

@@ -1,5 +1,6 @@
 import datetime
 from typing import List
+import secrets
 
 from pydantic import BaseModel
 from fastapi import FastAPI, Depends, Form
@@ -44,7 +45,7 @@ class AuthorisationCodeGrant(BaseModel):
         user: str,
         scopes: list[str] = None,
     ):
-        code = "some_random_code"
+        code = secrets.token_urlsafe(32)
         scopes = scopes or _DEFAULT_SCOPES
         expires = datetime.datetime.now() + datetime.timedelta(minutes=5)
         return cls(
@@ -57,6 +58,13 @@ class AuthorisationCodeGrant(BaseModel):
         )
 
 
+class AccessTokenDto(BaseModel):
+    access_token: str
+    token_type: str
+    expires_in: int
+    refresh_token: str
+
+
 class AccessToken(BaseModel):
     access_token: str
     token_type: str
@@ -66,6 +74,35 @@ class AccessToken(BaseModel):
     user: str
     client_id: str
     expires: datetime.datetime
+
+    @classmethod
+    def create(
+        cls,
+        client_id: str,
+        user: str,
+        scopes: list[str] = None,
+    ):
+        token = secrets.token_urlsafe(32)
+        refresh_token = secrets.token_urlsafe(32)
+        expires = datetime.datetime.now() + datetime.timedelta(minutes=5)
+        return cls(
+            access_token=token,
+            token_type="bearer",
+            client_id=client_id,
+            expires_in=3600,
+            refresh_token=refresh_token,
+            user=user,
+            scopes=scopes or _DEFAULT_SCOPES,
+            expires=expires,
+        )
+
+    def to_dto(self) -> AccessTokenDto:
+        return AccessTokenDto(
+            access_token=self.access_token,
+            token_type=self.token_type,
+            expires_in=self.expires_in,
+            refresh_token=self.refresh_token,
+        )
 
 
 _registered_clients = {
@@ -175,12 +212,40 @@ async def token(
     grant_type: Annotated[str, Form(...)],
     credentials: HTTPBasicCredentials = Depends(client_auth),
 ):
-    return {
-        "code": code,
-        "redirect_uri": redirect_uri,
-        "grant_type": grant_type,
-        "credentials": credentials,
-    }
+    # we know this is ok because of the middleware
+    client = _registered_clients[credentials.username]
+
+    auth_code: AuthorisationCodeGrant = next(
+        (c for c in _authorization_codes if c.code == code), None
+    )
+
+    if not auth_code:
+        return {
+            "result": "failure",
+            "output": f"no auth code found for {code}",
+        }
+
+    if auth_code.client_id != client["client_id"]:
+        return {
+            "result": "failure",
+            "output": f"client id mismatch for {code}",
+        }
+
+    if auth_code.redirect_uri != redirect_uri:
+        return {
+            "result": "failure",
+            "output": f"redirect uri mismatch for {code}",
+        }
+
+    # create an access token
+    token = AccessToken.create(
+        client_id=client["client_id"],
+        user=auth_code.user,
+        scopes=auth_code.scopes,
+    )
+    _access_tokens.append(token)
+
+    return token.to_dto()
 
 
 @app.get("/client-privileged-info")
