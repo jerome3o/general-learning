@@ -34,6 +34,7 @@ class AuthorisationCodeGrant(BaseModel):
     client_id: str
     redirect_uri: str
     expires: datetime.datetime
+    state: str = None
 
     @classmethod
     def create(

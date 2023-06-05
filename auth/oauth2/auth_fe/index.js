@@ -12,11 +12,17 @@ async function submitForm(event) {
   const redirect_uri = urlParams.get("redirect_uri") ?? "default_callback";
   const client_id = urlParams.get("client_id") ?? "default_client_id";
   const response_type = urlParams.get("response_type") ?? "default_code";
+  const state = urlParams.get("state") ?? "default_state";
+  const scopesRaw = urlParams.get("scopes") ?? "default_scopes";
+
+  const scopes = scopesRaw.split(" ");
 
   const jsonData = {
     redirect_uri,
     client_id,
     response_type,
+    scopes,
+    state,
   };
 
   let resp = await fetch("/oauth2/authorize", {

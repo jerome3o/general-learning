@@ -35,8 +35,11 @@ async def hello():
 
 
 @app.get("/oauth2/callback")
-async def oauth2_callback(code: str):
-    print(f"oauth2_callback: code={code}")
+async def oauth2_callback(code: str, state: str):
+    return {
+        "code": code,
+        "state": state,
+    }
 
 
 @app.get("/client-privileged-info")
