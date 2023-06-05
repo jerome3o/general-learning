@@ -3,7 +3,7 @@ from typing import List
 import secrets
 
 from pydantic import BaseModel
-from fastapi import FastAPI, Depends, Form, Header
+from fastapi import FastAPI, Depends, Form, Header, Request
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasicCredentials
@@ -165,6 +165,16 @@ async def hello():
         "registered_clients": _registered_clients,
         "registered_users": _registered_users,
     }
+
+
+@app.get("/oauth2/authorize")
+async def oauth2_authorize(request: Request):
+    print(request.query_params)
+    # serve the /static/index.html file
+    return RedirectResponse(
+        url=f"/static/index.html?{request.query_params}",
+        status_code=303,
+    )
 
 
 # client authorisation endpoint
