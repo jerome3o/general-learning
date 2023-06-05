@@ -12,3 +12,8 @@ I really want to understand oauth better. So I'm reading the RFC and implementin
 Query to the auth endpoint needs:
 * `response_type`
 * Should have `redirect_uri`
+
+
+## Auth server
+
+* Only accepts full redirect_uri's (no patterns)

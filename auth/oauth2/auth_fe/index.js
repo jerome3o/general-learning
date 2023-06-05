@@ -1,4 +1,4 @@
-function submitForm(event) {
+async function submitForm(event) {
   event.preventDefault();
 
   const form = document.getElementById("login-form");
@@ -19,26 +19,21 @@ function submitForm(event) {
     response_type,
   };
 
-  // fetch /oauth2/authorize, jsonify response and set innerhtml of "response" element
-  fetch("/oauth2/authorize", {
+  let resp = await fetch("/oauth2/authorize", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: "Basic " + btoa(username + ":" + password),
     },
     body: JSON.stringify(jsonData),
-  })
-    .then((response) => {
-      return response.json();
-    })
-    .then((data) => {
-      document.getElementById("response").innerHTML = JSON.stringify(
-        data,
-        null,
-        4
-      );
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+  });
+  console.log(resp);
+  // if resp is redirect, redirect to redirect_uri
+  if (resp.redirected) {
+    window.location.href = resp.url;
+  } else {
+    let json = await resp.json();
+    let formattedJson = JSON.stringify(json, null, 4);
+    document.getElementById("response").innerHTML = formattedJson;
+  }
 }

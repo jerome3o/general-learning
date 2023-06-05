@@ -1,7 +1,9 @@
 import datetime
+from typing import List
 
 from pydantic import BaseModel
 from fastapi import FastAPI, Depends
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
@@ -15,11 +17,43 @@ from common import (
 )
 from utils import PrintHeadersMiddleware, HTTPBasicWithAuth
 
+_DEFAULT_SCOPES = ["profile"]
 
-class AuthenticationRequest(BaseModel):
+
+class AuthorisationRequest(BaseModel):
     redirect_uri: str
     client_id: str
     response_type: str
+
+
+# information to be stored on the server
+class AuthorisationCodeGrant(BaseModel):
+    code: str
+    user: str
+    scopes: list[str]
+    client_id: str
+    redirect_uri: str
+    expires: datetime.datetime
+
+    @classmethod
+    def create(
+        cls,
+        client_id: str,
+        redirect_uri: str,
+        user: str,
+        scopes: list[str] = None,
+    ):
+        code = "some_random_code"
+        scopes = scopes or _DEFAULT_SCOPES
+        expires = datetime.datetime.now() + datetime.timedelta(minutes=5)
+        return cls(
+            code=code,
+            client_id=client_id,
+            redirect_uri=redirect_uri,
+            expires=expires,
+            user=user,
+            scopes=scopes,
+        )
 
 
 _registered_clients = {
@@ -50,6 +84,8 @@ _registered_users = {
         "privileged_info": "This is priviliged info for user2",
     },
 }
+
+_authorization_codes: List[AuthorisationCodeGrant] = []
 
 app = FastAPI()
 client_auth = HTTPBasicWithAuth(
@@ -83,12 +119,38 @@ async def hello():
 # client authorisation endpoint
 @app.post("/oauth2/authorize")
 async def login(
-    info: AuthenticationRequest,
+    info: AuthorisationRequest,
     credentials: HTTPBasicCredentials = Depends(user_auth),
 ):
-    print(credentials)
-    print(info)
-    return {"creds": credentials, "info": info}
+    # assert that the client is registered
+    if info.client_id not in _registered_clients:
+        return {
+            "result": "failure",
+            "output": f"client {info.client_id} not registered",
+        }
+
+    # assert the redirect uri is registered for the client
+    if info.redirect_uri not in _registered_clients[info.client_id]["redirect_uris"]:
+        return {
+            "result": "failure",
+            "output": (
+                f"redirect_uri {info.redirect_uri} "
+                f"not registered for client {info.client_id}"
+            ),
+        }
+
+    # create an authorisation code
+    code = AuthorisationCodeGrant.create(
+        client_id=info.client_id,
+        redirect_uri=info.redirect_uri,
+        user=credentials.username,
+    )
+    _authorization_codes.append(code)
+
+    # todo understand state
+    return RedirectResponse(
+        url=f"{info.redirect_uri}?code={code.code}&state=xyz", status_code=303
+    )
 
 
 # token endpoint
