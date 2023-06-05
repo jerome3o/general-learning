@@ -305,9 +305,8 @@ def get_privileged_user_info(authorization: Annotated[str, Header()]):
     return {
         "authorization": authorization,
         "result": "success",
-        "output": _registered_users["user1"]["privileged_info"]
-        + " "
-        + str(datetime.datetime.now()),
+        "output": _registered_users["user1"],
+        "time": str(datetime.datetime.now()),
     }
 
 

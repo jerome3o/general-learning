@@ -1,7 +1,9 @@
 import secrets
 
 from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 import requests
@@ -44,6 +46,9 @@ async def hello():
     }
 
 
+app.mount("/static", StaticFiles(directory="user_agent"), name="static")
+
+
 @app.get("/oauth2/info")
 async def oauth2_info(request: Request):
     print(request.session)
@@ -79,17 +84,31 @@ async def oauth2_callback(code: str, state: str):
     if response.status_code != 200:
         return {"error": response.json()}
 
+    _session_map[state] = response.json()
+
+    return RedirectResponse(url="/static/index.html")
+
+
+@app.get("/user/data")
+async def user_data(request: Request):
+    if "state" not in request.session or request.session["state"] not in _session_map:
+        # redirect to login
+        return RedirectResponse(url="/static/login.html")
+
+    # get privileged info from resource server
+    token = _session_map[request.session["state"]]["access_token"]
+
     # get privileged info from resource server
     # https://requests.readthedocs.io/en/master/user/authentication/#bearer-authentication
     response = requests.get(
         f"{RESOURCE_SERVER_BASE}/user-privileged-info",
         headers={
             "Accept": "application/json",
-            "Authorization": f"Bearer {response.json()['access_token']}",
+            "Authorization": f"Bearer {token}",
         },
     )
 
-    return {"response_from_auth": response.json()}
+    return {"data": response.json()}
 
 
 @app.get("/client-privileged-info")
