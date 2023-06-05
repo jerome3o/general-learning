@@ -17,8 +17,6 @@ from utils import PrintHeadersMiddleware, HTTPBasicWithAuth
 
 
 class AuthenticationRequest(BaseModel):
-    username: str
-    password: str
     redirect_uri: str
     client_id: str
     response_type: str
@@ -55,7 +53,10 @@ _registered_users = {
 
 app = FastAPI()
 client_auth = HTTPBasicWithAuth(
-    users={c: _registered_clients[c]["client_secret"] for c in _registered_clients}
+    users={c: v["client_secret"] for c, v in _registered_clients.items()}
+)
+user_auth = HTTPBasicWithAuth(
+    users={c: v["password"] for c, v in _registered_users.items()}
 )
 
 app.mount("/static", StaticFiles(directory="auth_fe"), name="static")
@@ -81,9 +82,13 @@ async def hello():
 
 # client authorisation endpoint
 @app.post("/oauth2/authorize")
-async def login(info: AuthenticationRequest):
+async def login(
+    info: AuthenticationRequest,
+    credentials: HTTPBasicCredentials = Depends(user_auth),
+):
+    print(credentials)
     print(info)
-    return {"result": "todo"}
+    return {"creds": credentials, "info": info}
 
 
 # token endpoint

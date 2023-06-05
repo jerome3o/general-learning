@@ -7,8 +7,6 @@ function submitForm(event) {
   const password = form.querySelector("#password").value;
 
   const jsonData = {
-    username: username,
-    password: password,
     // todo get from query parameters
     redirect_uri: "http://localhost:8000/oauth2/callback",
     client_id: "client_id",
@@ -20,6 +18,7 @@ function submitForm(event) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: "Basic " + btoa(username + ":" + password),
     },
     body: JSON.stringify(jsonData),
   })
