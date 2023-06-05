@@ -4,7 +4,7 @@ import secrets
 
 from pydantic import BaseModel
 from fastapi import FastAPI, Depends, Form, Header, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasicCredentials
 from fastapi.staticfiles import StaticFiles
@@ -186,20 +186,26 @@ async def login(
 ):
     # assert that the client is registered
     if info.client_id not in _registered_clients:
-        return {
-            "result": "failure",
-            "output": f"client {info.client_id} not registered",
-        }
+        return Response(
+            content={
+                "result": "failure",
+                "output": f"client {info.client_id} not registered",
+            },
+            status_code=400,
+        )
 
     # assert the redirect uri is registered for the client
     if info.redirect_uri not in _registered_clients[info.client_id]["redirect_uris"]:
-        return {
-            "result": "failure",
-            "output": (
-                f"redirect_uri {info.redirect_uri} "
-                f"not registered for client {info.client_id}"
-            ),
-        }
+        return Response(
+            status_code=400,
+            content={
+                "result": "failure",
+                "output": (
+                    f"redirect_uri {info.redirect_uri} "
+                    f"not registered for client {info.client_id}"
+                ),
+            },
+        )
 
     # create an authorisation code
     code = AuthorisationCodeGrant.create(
@@ -231,22 +237,31 @@ async def token(
     )
 
     if not auth_code:
-        return {
-            "result": "failure",
-            "output": f"no auth code found for {code}",
-        }
+        return Response(
+            content={
+                "result": "failure",
+                "output": f"no auth code found for {code}",
+            },
+            status_code=400,
+        )
 
     if auth_code.client_id != client["client_id"]:
-        return {
-            "result": "failure",
-            "output": f"client id mismatch for {code}",
-        }
+        return Response(
+            content={
+                "result": "failure",
+                "output": f"client id mismatch for {code}",
+            },
+            status_code=400,
+        )
 
     if auth_code.redirect_uri != redirect_uri:
-        return {
-            "result": "failure",
-            "output": f"redirect uri mismatch for {code}",
-        }
+        return Response(
+            content={
+                "result": "failure",
+                "output": f"redirect uri mismatch for {code}",
+            },
+            status_code=400,
+        )
 
     # create an access token
     token = AccessToken.create(
@@ -270,16 +285,22 @@ def get_privileged_user_info(authorization: Annotated[str, Header()]):
     )
 
     if not token:
-        return {
-            "result": "failure",
-            "output": f"no token found for {authorization}",
-        }
+        return Response(
+            content={
+                "result": "failure",
+                "output": f"no token found for {authorization}",
+            },
+            status_code=403,
+        )
 
     if token.expires < datetime.datetime.now():
-        return {
-            "result": "failure",
-            "output": f"token expired for {authorization}",
-        }
+        return Response(
+            content={
+                "result": "failure",
+                "output": f"token expired for {authorization}",
+            },
+            status_code=403,
+        )
 
     return {
         "authorization": authorization,
@@ -295,17 +316,23 @@ def get_privileged_client_info(
     credentials: Annotated[HTTPBasicCredentials, Depends(client_auth)]
 ):
     if credentials.username not in _registered_clients:
-        return {
-            "result": "failure",
-            "output": f"client {credentials.username} not registered",
-        }
+        return Response(
+            content={
+                "result": "failure",
+                "output": f"client {credentials.username} not registered",
+            },
+            status_code=400,
+        )
 
     client = _registered_clients[credentials.username]
     if client["client_secret"] != credentials.password:
-        return {
-            "result": "failure",
-            "output": f"incorrect client secret for {credentials.username}",
-        }
+        return Response(
+            content={
+                "result": "failure",
+                "output": f"incorrect client secret for {credentials.username}",
+            },
+            status_code=400,
+        )
 
     # with current time appended
     return {

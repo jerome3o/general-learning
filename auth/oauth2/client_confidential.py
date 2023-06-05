@@ -18,6 +18,8 @@ from utils import PrintHeadersMiddleware
 
 _secret_key = "secure-secret-key-that-isnt-hardcoded"
 
+_session_map = {}
+
 app = FastAPI()
 
 app.add_middleware(
@@ -74,6 +76,8 @@ async def oauth2_callback(code: str, state: str):
         },
         auth=(CLIENT_CONFIDENTIAL_ID, CLIENT_CONFIDENTIAL_SECRET),
     )
+    if response.status_code != 200:
+        return {"error": response.json()}
 
     # get privileged info from resource server
     # https://requests.readthedocs.io/en/master/user/authentication/#bearer-authentication
