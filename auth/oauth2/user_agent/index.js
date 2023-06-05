@@ -45,3 +45,14 @@ document
         );
       });
   });
+
+// fetch data from localhost:8000/oauth2/info and put json output in login-with-auth-server-info
+// probably don't need the credentials: "include" option if hosted on same domain
+fetch("http://localhost:8000/oauth2/info", { credentials: "include" })
+  .then(function (response) {
+    return response.json();
+  })
+  .then(function (json) {
+    document.getElementById("login-with-auth-server-info").innerHTML =
+      JSON.stringify(json, null, 4);
+  });

@@ -1,7 +1,12 @@
-from fastapi import FastAPI
+import secrets
+from typing_extensions import Annotated
+
+from fastapi import FastAPI, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 
 import requests
+
 
 from common import (
     CLIENT_CONFIDENTIAL_SECRET,
@@ -11,6 +16,8 @@ from common import (
     RESOURCE_SERVER_BASE,
 )
 from utils import PrintHeadersMiddleware
+
+_secret_key = "secure-secret-key-that-isnt-hardcoded"
 
 app = FastAPI()
 
@@ -23,6 +30,8 @@ app.add_middleware(
 )
 app.add_middleware(PrintHeadersMiddleware)
 
+app.add_middleware(SessionMiddleware, secret_key=_secret_key)
+
 
 @app.get("/")
 async def hello():
@@ -31,6 +40,21 @@ async def hello():
         "CLIENT_CONFIDENTIAL_SECRET": CLIENT_CONFIDENTIAL_SECRET,
         "CLIENT_CONFIDENTIAL_ID": CLIENT_CONFIDENTIAL_ID,
         "CLIENT_CONFIDENTIAL_REDIRECT_URI": CLIENT_CONFIDENTIAL_REDIRECT_URI,
+    }
+
+
+@app.get("/oauth2/info")
+async def oauth2_info(request: Request):
+    print(request.session)
+    if "state" not in request.session:
+        request.session["state"] = secrets.token_urlsafe(16)
+
+    return {
+        "state": request.session["state"],
+        "redirect_uri": CLIENT_CONFIDENTIAL_REDIRECT_URI,
+        "client_id": CLIENT_CONFIDENTIAL_ID,
+        "response_type": "code",
+        "scopes": "profile",
     }
 
 

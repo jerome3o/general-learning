@@ -23,11 +23,10 @@
       <!-- login with Auth Server button, links to auth server -->
       <h2>Login with Auth Server</h2>
       <!-- todo move this button redirect to js -->
-      <a
-        href="http://localhost:8001/static/index.html?redirect_uri=http://localhost:8000/oauth2/callback&client_id=client_confidential_id&response_type=code&state=xyz&scopes=profile"
-        class="btn btn-primary button-space"
-        >Login with Auth Server</a
-      >
+      <button id="login-with-auth-server" class="btn btn-primary button-space">
+        Login with Auth Server
+      </button>
+      <pre id="login-with-auth-server-info"></pre>
 
       <h2>Debug Info</h2>
       <!-- hello from index.js -->
