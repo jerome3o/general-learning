@@ -1,5 +1,6 @@
 import datetime
 
+from pydantic import BaseModel
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasicCredentials
@@ -13,6 +14,15 @@ from common import (
     RESOURCE_SERVER_PORT,
 )
 from utils import PrintHeadersMiddleware, HTTPBasicWithAuth
+
+
+class AuthenticationRequest(BaseModel):
+    username: str
+    password: str
+    redirect_uri: str
+    client_id: str
+    response_type: str
+
 
 _registered_clients = {
     CLIENT_CONFIDENTIAL_ID: {
@@ -69,9 +79,10 @@ async def hello():
     }
 
 
-# authorisation endpoint
-@app.get("/oauth2/authorize")
-async def authorize():
+# client authorisation endpoint
+@app.post("/oauth2/authorize")
+async def login(info: AuthenticationRequest):
+    print(info)
     return {"result": "todo"}
 
 

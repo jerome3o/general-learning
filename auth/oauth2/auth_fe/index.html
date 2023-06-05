@@ -17,9 +17,35 @@
   </head>
   <body>
     <div class="container">
-      <h1>Demo FE</h1>
-      <!-- span to indicate index.js loaded -->
-      <span id="index-js-loaded"></span>
+      <h1>Login to Auth Server</h1>
+      <small>Authenticate with the resource/authetication service</small>
+      <!-- user/pass login form -->
+      <form id="login-form" onsubmit="submitForm(event)">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            name="username"
+            type="text"
+            class="form-control"
+            id="username"
+            aria-describedby="usernameHelp"
+            placeholder="Enter username"
+          />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            name="password"
+            type="password"
+            class="form-control"
+            id="password"
+            placeholder="Password"
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+      <!-- response -->
+      <pre id="response"></pre>
     </div>
   </body>
 </html>
