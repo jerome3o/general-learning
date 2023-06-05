@@ -34,6 +34,11 @@ async def hello():
     }
 
 
+@app.get("/oauth2/callback")
+async def oauth2_callback(code: str):
+    print(f"oauth2_callback: code={code}")
+
+
 @app.get("/client-privileged-info")
 def get_privileged_info(with_auth: bool = True):
     # get privileged info from resource server to demonstrate basic auth

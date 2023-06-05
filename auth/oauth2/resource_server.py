@@ -39,7 +39,19 @@ app.add_middleware(PrintHeadersMiddleware)
 
 @app.get("/")
 async def hello():
-    return _registered_clients
+    return {"registered_clients": _registered_clients}
+
+
+# authorisation endpoint
+@app.get("/oauth2/authorize")
+async def authorize():
+    return {"result": "todo"}
+
+
+# token endpoint
+@app.post("/oauth2/token")
+async def token():
+    return {"result": "todo"}
 
 
 @app.get("/client-privileged-info")
