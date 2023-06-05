@@ -11,7 +11,7 @@ from common import (
     CLIENT_CONFIDENTIAL_REDIRECT_URI,
     RESOURCE_SERVER_PORT,
 )
-from utils import PrintHeadersMiddleware
+from utils import PrintHeadersMiddleware, HTTPBasicWithAuth
 
 _registered_clients = {
     CLIENT_CONFIDENTIAL_ID: {
@@ -44,6 +44,10 @@ _registered_users = {
 
 app = FastAPI()
 security = HTTPBasic()
+client_auth = HTTPBasicWithAuth(
+    users={c: _registered_clients[c]["client_secret"] for c in _registered_clients}
+)
+print(client_auth.users)
 
 app.add_middleware(
     CORSMiddleware,
@@ -78,7 +82,7 @@ async def token():
 
 @app.get("/client-privileged-info")
 def get_privileged_info(
-    credentials: Annotated[HTTPBasicCredentials, Depends(security)]
+    credentials: Annotated[HTTPBasicCredentials, Depends(client_auth)]
 ):
     if credentials.username not in _registered_clients:
         return {
