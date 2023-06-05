@@ -23,6 +23,25 @@ _registered_clients = {
     }
 }
 
+_registered_users = {
+    "user1": {
+        "username": "user1",
+        "password": "password1",
+        "first_name": "User",
+        "last_name": "One",
+        "scopes": ["profile"],
+        "privileged_info": "This is priviliged info for user1",
+    },
+    "user2": {
+        "username": "user2",
+        "password": "password2",
+        "first_name": "User",
+        "last_name": "Two",
+        "scopes": ["profile"],
+        "privileged_info": "This is priviliged info for user2",
+    },
+}
+
 app = FastAPI()
 security = HTTPBasic()
 
@@ -39,7 +58,10 @@ app.add_middleware(PrintHeadersMiddleware)
 
 @app.get("/")
 async def hello():
-    return {"registered_clients": _registered_clients}
+    return {
+        "registered_clients": _registered_clients,
+        "registered_users": _registered_users,
+    }
 
 
 # authorisation endpoint
