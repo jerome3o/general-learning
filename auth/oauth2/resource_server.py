@@ -2,7 +2,7 @@ import datetime
 
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.security import HTTPBasicCredentials
 from typing_extensions import Annotated
 
 from common import (
@@ -43,7 +43,6 @@ _registered_users = {
 }
 
 app = FastAPI()
-security = HTTPBasic()
 client_auth = HTTPBasicWithAuth(
     users={c: _registered_clients[c]["client_secret"] for c in _registered_clients}
 )
@@ -76,7 +75,8 @@ async def authorize():
 
 # token endpoint
 @app.post("/oauth2/token")
-async def token():
+async def token(credentials: HTTPBasicCredentials = Depends(client_auth)):
+    print(credentials)
     return {"result": "todo"}
 
 
