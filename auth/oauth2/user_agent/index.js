@@ -33,7 +33,7 @@ fetch("http://localhost:8001/")
 document
   .getElementById("test-basic-auth")
   .addEventListener("click", function () {
-    fetch("http://localhost:8000/privileged-info")
+    fetch("http://localhost:8000/client-privileged-info")
       .then(function (response) {
         return response.json();
       })

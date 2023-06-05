@@ -34,13 +34,13 @@ async def hello():
     }
 
 
-@app.get("/privileged-info")
+@app.get("/client-privileged-info")
 def get_privileged_info(with_auth: bool = True):
     # get privileged info from resource server to demonstrate basic auth
     # https://requests.readthedocs.io/en/master/user/authentication/#basic-authentication
     if with_auth:
         response = requests.get(
-            f"{RESOURCE_SERVER_BASE}/privileged-info",
+            f"{RESOURCE_SERVER_BASE}/client-privileged-info",
             auth=(CLIENT_CONFIDENTIAL_ID, CLIENT_CONFIDENTIAL_SECRET),
             # auth=("sdfsdfsdf", "sdfsdfs"),
             # auth=(CLIENT_CONFIDENTIAL_ID, "sdfsdfs"),

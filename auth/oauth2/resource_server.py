@@ -42,7 +42,7 @@ async def hello():
     return _registered_clients
 
 
-@app.get("/privileged-info")
+@app.get("/client-privileged-info")
 def get_privileged_info(
     credentials: Annotated[HTTPBasicCredentials, Depends(security)]
 ):
