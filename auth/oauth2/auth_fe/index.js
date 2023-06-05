@@ -6,11 +6,17 @@ function submitForm(event) {
   const username = form.querySelector("#username").value;
   const password = form.querySelector("#password").value;
 
+  // get query parameters for current page
+  const urlParams = new URLSearchParams(window.location.search);
+  // allow defaults
+  const redirect_uri = urlParams.get("redirect_uri") ?? "default_callback";
+  const client_id = urlParams.get("client_id") ?? "default_client_id";
+  const response_type = urlParams.get("response_type") ?? "default_code";
+
   const jsonData = {
-    // todo get from query parameters
-    redirect_uri: "http://localhost:8000/oauth2/callback",
-    client_id: "client_id",
-    response_type: "code",
+    redirect_uri,
+    client_id,
+    response_type,
   };
 
   // fetch /oauth2/authorize, jsonify response and set innerhtml of "response" element
