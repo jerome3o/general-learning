@@ -1,0 +1,5 @@
+/* add bottom and top margin for login-with-auth-server */
+.button-space {
+    margin-top: 1vh;
+    margin-bottom: 20vh;
+}

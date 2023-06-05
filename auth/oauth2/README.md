@@ -12,6 +12,3 @@ I really want to understand oauth better. So I'm reading the RFC and implementin
 Query to the auth endpoint needs:
 * `response_type`
 * Should have `redirect_uri`
-
-
-http://localhost:8001/static/index.html?redirect_uri=http://localhost:8000/oauth2/callback&client_id=client_id&response_type=code
