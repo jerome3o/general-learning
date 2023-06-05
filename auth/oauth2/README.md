@@ -19,3 +19,4 @@ Query to the auth endpoint needs:
 * Only accepts full redirect_uri's (no patterns)
 * Doesn't really have scopes
 * Doesn't support registering (Hard coded users / clients)
+* Doesn't handle/report errors properly (if at all)

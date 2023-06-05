@@ -2,7 +2,7 @@ import datetime
 from typing import List
 
 from pydantic import BaseModel
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Form
 from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasicCredentials
@@ -57,6 +57,17 @@ class AuthorisationCodeGrant(BaseModel):
         )
 
 
+class AccessToken(BaseModel):
+    access_token: str
+    token_type: str
+    expires_in: int
+    refresh_token: str
+    scopes: list[str]
+    user: str
+    client_id: str
+    expires: datetime.datetime
+
+
 _registered_clients = {
     CLIENT_CONFIDENTIAL_ID: {
         "client_id": CLIENT_CONFIDENTIAL_ID,
@@ -87,6 +98,8 @@ _registered_users = {
 }
 
 _authorization_codes: List[AuthorisationCodeGrant] = []
+
+_access_tokens = []
 
 app = FastAPI()
 client_auth = HTTPBasicWithAuth(
@@ -156,9 +169,18 @@ async def login(
 
 # token endpoint
 @app.post("/oauth2/token")
-async def token(credentials: HTTPBasicCredentials = Depends(client_auth)):
-    print(credentials)
-    return {"result": "todo"}
+async def token(
+    code: Annotated[str, Form(...)],
+    redirect_uri: Annotated[str, Form(...)],
+    grant_type: Annotated[str, Form(...)],
+    credentials: HTTPBasicCredentials = Depends(client_auth),
+):
+    return {
+        "code": code,
+        "redirect_uri": redirect_uri,
+        "grant_type": grant_type,
+        "credentials": credentials,
+    }
 
 
 @app.get("/client-privileged-info")

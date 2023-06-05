@@ -36,10 +36,22 @@ async def hello():
 
 @app.get("/oauth2/callback")
 async def oauth2_callback(code: str, state: str):
-    return {
-        "code": code,
-        "state": state,
-    }
+    # exchange code for token
+    # https://requests.readthedocs.io/en/master/user/quickstart/#custom-headers
+    response = requests.post(
+        f"{RESOURCE_SERVER_BASE}/oauth2/token",
+        headers={
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Accept": "application/json",
+        },
+        data={
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": CLIENT_CONFIDENTIAL_REDIRECT_URI,
+        },
+        auth=(CLIENT_CONFIDENTIAL_ID, CLIENT_CONFIDENTIAL_SECRET),
+    )
+    return {"response_from_auth": response.json()}
 
 
 @app.get("/client-privileged-info")
