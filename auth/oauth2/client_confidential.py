@@ -10,6 +10,7 @@ from common import (
     CLIENT_CONFIDENTIAL_PORT,
     RESOURCE_SERVER_BASE,
 )
+from utils import PrintHeadersMiddleware
 
 app = FastAPI()
 
@@ -20,6 +21,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(PrintHeadersMiddleware)
 
 
 @app.get("/")

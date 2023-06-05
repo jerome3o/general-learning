@@ -11,7 +11,7 @@ from common import (
     CLIENT_CONFIDENTIAL_REDIRECT_URI,
     RESOURCE_SERVER_PORT,
 )
-
+from utils import PrintHeadersMiddleware
 
 _registered_clients = {
     CLIENT_CONFIDENTIAL_ID: {
@@ -26,7 +26,6 @@ _registered_clients = {
 app = FastAPI()
 security = HTTPBasic()
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -34,6 +33,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(PrintHeadersMiddleware)
 
 
 @app.get("/")
@@ -75,6 +76,7 @@ def main():
         host="localhost",
         reload=True,
         port=RESOURCE_SERVER_PORT,
+        log_level="debug",
     )
 
 
