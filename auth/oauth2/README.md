@@ -27,7 +27,5 @@ Query to the auth endpoint needs:
 
 ## Todo
 
-* get state working from the client, sessions?
-* http response codes
-* client token storage
 * refreshing tokens
+* actually use scope (don't just return everything)
