@@ -25,6 +25,7 @@ class AuthorisationRequest(BaseModel):
     redirect_uri: str
     client_id: str
     response_type: str
+    state: str
 
 
 # information to be stored on the server
@@ -210,7 +211,7 @@ async def login(
 
     # todo understand state
     return RedirectResponse(
-        url=f"{info.redirect_uri}?code={code.code}&state=xyz", status_code=303
+        url=f"{info.redirect_uri}?code={code.code}&state={info.state}", status_code=303
     )
 
 
